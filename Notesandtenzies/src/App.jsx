@@ -23,11 +23,21 @@ function App() {
     }
     
     function updateNote(text) {
-        setNotes(oldNotes => oldNotes.map(oldNote => {
-            return oldNote.id === currentNoteId
-                ? { ...oldNote, body: text }
-                : oldNote
-        }))
+        setNotes(oldNotes => {
+           const newArray=[]
+           for(let i=0;i<oldNotes.length;i++){
+            if(oldNotes[i].id===currentNoteId){
+                newArray.unshift({
+                    ...oldNotes[i],
+                    body:text
+                })
+            }else{
+                newArray.push(oldNotes[i])
+            }
+            return newArray
+
+           }
+        })
     }
     
     function findCurrentNote() {
