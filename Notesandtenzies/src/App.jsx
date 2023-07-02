@@ -34,10 +34,15 @@ function App() {
             }else{
                 newArray.push(oldNotes[i])
             }
+        }
             return newArray
-
-           }
+           
         })
+    }
+    function deleteNote(event, noteId) {
+        event.stopPropagation()
+        setNotes(oldNotes=>oldNotes.filter(note=>note.id!==noteId))
+        // One can also add the for loop creating a new array, iterating through the array, and remove the object with prop of NOTEId(This is instead of using .filter method)
     }
     
     function findCurrentNote() {
@@ -61,6 +66,7 @@ function App() {
                     currentNote={findCurrentNote()}
                     setCurrentNoteId={setCurrentNoteId}
                     newNote={createNewNote}
+                    handleClick={deleteNote}
                 />
                 {
                     currentNoteId && 
