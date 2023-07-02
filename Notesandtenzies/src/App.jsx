@@ -1,18 +1,22 @@
 import React from "react"
 import Sidebar from "./Sidebar"
 import Editor from "./Editor"
-import { data } from "./data"
+
 import Split from "react-split"
 import {nanoid} from "nanoid"
-
+import { onSnapshot } from "firebase/firestore"
+import { notesCollection } from "./firebase"
 function App() {
     const [notes, setNotes] = React.useState(()=>JSON.parse(localStorage.getItem('notes'))||[])
     const [currentNoteId, setCurrentNoteId] = React.useState(
         (notes[0] && notes[0].id) || ""
     )
     React.useEffect(()=>{
-        localStorage.setItem('notes',JSON.stringify(notes))
-    },[notes])
+        onSnapshot(notesCollection,(snapshot)=>{
+
+        })
+    },[])
+
     function createNewNote() {
         const newNote = {
             id: nanoid(),
