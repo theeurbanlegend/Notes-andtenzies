@@ -16,5 +16,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const Database=getFirestore(app)
+export const Database=getFirestore(app)
  export const notesCollection=collection(Database,"notes")

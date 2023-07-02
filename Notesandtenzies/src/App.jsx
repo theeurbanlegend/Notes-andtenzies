@@ -2,14 +2,11 @@ import React from "react"
 import Sidebar from "./Sidebar"
 import Editor from "./Editor"
 import Split from "react-split"
-import {nanoid} from "nanoid"
-import { addDoc, onSnapshot } from "firebase/firestore"
-import { notesCollection } from "./firebase"
+import { addDoc, deleteDoc,doc, onSnapshot, setDoc } from "firebase/firestore"
+import { Database, notesCollection } from "./firebase"
 function App() {
     const [notes, setNotes] = React.useState([])
-    const [currentNoteId, setCurrentNoteId] = React.useState(
-        (notes[0] && notes[0].id) || ""
-    )
+    const [currentNoteId, setCurrentNoteId] = React.useState("")
     React.useEffect(()=>{
         const detach=onSnapshot(notesCollection,(snapshot)=>{
             const notesArr=snapshot.docs.map(doc=>({
@@ -20,7 +17,11 @@ function App() {
         })
         return detach
     },[])
-
+    React.useEffect(()=>{
+        if(!currentNoteId){
+            setCurrentNoteId(notes[0]?.id)
+        }
+    },[notes])
     async function createNewNote() {
         const newNote = {
             body: "# Type your markdown note's title here"
@@ -30,26 +31,14 @@ function App() {
     }
     
     function updateNote(text) {
-        setNotes(oldNotes => {
-           const newArray=[]
-           for(let i=0;i<oldNotes.length;i++){
-            if(oldNotes[i].id===currentNoteId){
-                newArray.unshift({
-                    ...oldNotes[i],
-                    body:text
-                })
-            }else{
-                newArray.push(oldNotes[i])
-            }
-        }
-            return newArray
-           
-        })
+        const docRef=doc(Database,"notes",currentNoteId)
+        setDoc(docRef,{
+            body:text
+        },{merge:true}) 
     }
-    function deleteNote(event, noteId) {
-        event.stopPropagation()
-        setNotes(oldNotes=>oldNotes.filter(note=>note.id!==noteId))
-        // One can also add the for loop creating a new array, iterating through the array, and remove the object with prop of NOTEId(This is instead of using .filter method)
+    async function deleteNote(noteId) {
+        const docRef=doc(Database,"notes",noteId)
+        await deleteDoc(docRef)
     }
     
     function findCurrentNote() {
@@ -75,14 +64,11 @@ function App() {
                     newNote={createNewNote}
                     handleClick={deleteNote}
                 />
-                {
-                    currentNoteId && 
-                    notes.length > 0 &&
-                    <Editor 
+                <Editor 
                         currentNote={findCurrentNote()} 
                         updateNote={updateNote} 
                     />
-                }
+                
             </Split>
             :
             <div className="no-notes">
